@@ -1,0 +1,24 @@
+Source: vyatta-service-portmonitor
+Section: contrib/net
+Priority: extra
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Build-Depends: debhelper (>= 9),
+	       dh-yang
+Standards-Version: 3.9.6
+
+Package: vyatta-service-portmonitor-v1-yang
+Architecture: all
+Depends: vyatta-cfg (>= 0.104.32),
+	 libconfig-tiny-perl,
+	 ${misc:Depends},
+	 ${perl:Depends},
+	 ${yang:Depends},
+	 libjson-perl,
+	 libmodule-load-conditional-perl,
+	 libvyatta-dataplane-perl,
+	 libvyatta-interface-perl (>= 1.49),
+	 vyatta-dataplane-cfg-npf-cfg-2,
+	 vplane-config-npf (>= 1.8.7)
+Description: Portmonitor scripts
+ Vyatta configuration/operational commands for
+ portmonitor service.

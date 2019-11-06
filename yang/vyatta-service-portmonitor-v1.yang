@@ -1,0 +1,280 @@
+module vyatta-service-portmonitor-v1 {
+	namespace "urn:vyatta.com:mgmt:vyatta-service-portmonitor:1";
+	prefix vyatta-service-portmonitor-v1;
+
+	import vyatta-services-v1 {
+		prefix service;
+	}
+	import configd-v1 {
+		prefix configd;
+	}
+	import vyatta-security-v1 {
+		prefix security;
+	}
+	import vyatta-security-firewall-v1 {
+		prefix firewall;
+	}
+	import vyatta-interfaces-dataplane-v1 {
+		prefix interfaces-dataplane;
+	}
+	import vyatta-interfaces-erspan-v1 {
+		prefix interfaces-erspan;
+	}
+	import vyatta-interfaces-bonding-v1 {
+		prefix interfaces-bonding;
+	}
+
+	organization "AT&T Inc.";
+	contact
+		"AT&T
+		 Postal: 208 S. Akard Street
+		         Dallas, TX 25202
+		 Web: www.att.com";
+
+	description
+		"Copyright (c) 2018-2019, AT&T Intellectual Property.
+		 All rights reserved.
+
+		 Copyright (c) 2015-2017 by Brocade Communications Systems, Inc.
+		 All rights reserved.
+
+		 Redistribution and use in source and binary forms, with or without
+		 modification, are permitted provided that the following conditions
+		 are met:
+
+		     1. Redistributions of source code must retain the above copyright
+			notice, this list of conditions and the following disclaimer.
+		     2. Redistributions in binary form must reproduce the above
+			copyright notice, this list of conditions and the following
+			disclaimer in the documentation and/or other materials provided
+			with the distribution.
+		     3. Neither the name of the copyright holder nor the names of its
+			contributors may be used to endorse or promote products derived
+			from this software without specific prior written permission.
+
+		     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+		     'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+		     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+		     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		     COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+		     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+		     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+		     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+		     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+		     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+		     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		     POSSIBILITY OF SUCH DAMAGE.
+
+		 SPDX-License-Identifier: BSD-3-Clause
+
+		 Vyatta portmonitor yang file and portmonitor specific
+		 scripts.";
+
+	revision 2018-10-15 {
+		description "Include bonding interface in portmonitor interface type";
+	}
+
+	revision 2018-10-09 {
+		description "Support for vhost and vhost vif interfaces";
+	}
+
+	revision 2018-02-28 {
+		description "Prevent stateful rules from being configured";
+	}
+
+	revision 2017-04-11 {
+		description "Change type of source and destination nodes";
+	}
+
+	revision 2016-08-08 {
+		description "Portmonitor filters support.";
+	}
+
+	revision 2015-08-14 {
+		description "Initial revision of version 1.";
+	}
+
+	typedef portmonitor-ifname {
+		description "Portmonitor interface name";
+		type union {
+			type interfaces-dataplane:dataplane-ifname {
+				configd:help "Dataplane interface name";
+			}
+			type interfaces-dataplane:dataplane-vifname {
+				configd:help "VIF interface name";
+			}
+			type interfaces-erspan:erspan-ifname {
+				configd:help "ERSPAN interface name";
+			}
+			type string {
+				pattern 'dp[0-9]+vhost[0-9]+';
+				configd:pattern-help "<dpFvhostN>";
+				configd:help "Vhost interface name where available";
+			}
+			type interfaces-bonding:bonding-ifname {
+				configd:help "Bonding interface name";
+			}
+			type string {
+				pattern 'dp[0-9]+vhost[0-9]+\.[1-9][0-9]*';
+				configd:pattern-help "<dpFvhostN.M>";
+				configd:help "Vhost vif interface name where available";
+			}
+		}
+	}
+
+	typedef direction {
+		description "Policy to receive and/or transmit packets";
+		type enumeration {
+			enum "both" {
+				configd:help "Direction for receiving and transmitting packets";
+			}
+			enum "rx" {
+				configd:help "Direction for only receiving packets";
+			}
+			enum "tx" {
+				configd:help "Direction for only transmitting packets";
+			}
+		}
+	}
+
+	typedef session-type {
+		description "Type of portmonitor session";
+		type enumeration {
+			enum "span" {
+				configd:help "Session type SPAN";
+			}
+			enum "rspan-source" {
+				configd:help "Session type RSPAN source";
+			}
+			enum "rspan-destination" {
+				configd:help "Session type RSPAN destination";
+			}
+			enum "erspan-source" {
+				configd:help "Session type ERSPAN source";
+			}
+			enum "erspan-destination" {
+				configd:help "Session type ERSPAN destination";
+			}
+		}
+	}
+
+	typedef header-type {
+		description "Header type of portmonitor session of type erspan";
+		type enumeration {
+			enum "type-II" {
+				configd:help "ERSPAN header Type-II";
+			}
+			enum "type-III" {
+				configd:help "ERSPAN header Type-III";
+			}
+		}
+	}
+
+	augment /service:service {
+		container portmonitor {
+			presence "enable portmonitor";
+			configd:help "Portmonitor configuration";
+			configd:validate "vplane-portmonitor-validate.pl";
+			configd:end "vyatta-portmonitor.pl --action=update";
+			configd:priority "810";
+			description "Portmonitor configuration container";
+			list session {
+				configd:help "Portmonitor session configuration";
+				description "Portmonitor session configuration";
+				max-elements "8";
+				key "list-key";
+				leaf list-key {
+					type uint8 {
+						range 1..31;
+						configd:help "Portmonitor session configuration";
+					}
+					configd:help "Portmonitor session identifier";
+					description "Portmonitor session identifier";
+				}
+				leaf type {
+					type session-type;
+					mandatory true;
+					configd:help "Type for portmonitoring";
+					description "Portmonitor session type";
+				}
+				leaf description {
+					type string {
+						length "1..256";
+					}
+					configd:help "Session Description";
+					description "Portmonitor session description";
+				}
+				leaf disable {
+					type empty;
+					configd:help "Disable portmonitor session";
+					description "Disable portmonitor session";
+				}
+				container filter {
+					configd:help "Portmonitor session filter configuration";
+					description "Portmonitor session filter configuration";
+					leaf-list in {
+						type leafref {
+							path "/security:security/firewall:firewall/firewall:name/firewall:ruleset-name";
+						}
+						ordered-by "user";
+						configd:help "Ruleset for portmonitor session RX packets";
+						description "Ruleset for portmonitor session RX packets";
+						configd:validate "validate-session-usage -name $VAR(@) -variant portmonitor";
+					}
+					leaf-list out {
+						type leafref {
+							path "/security:security/firewall:firewall/firewall:name/firewall:ruleset-name";
+						}
+						ordered-by "user";
+						configd:help "Ruleset for portmonitor session TX packets";
+						description "Ruleset for portmonitor session TX packets";
+						configd:validate "validate-session-usage -name $VAR(@) -variant portmonitor";
+					}
+				}
+				list source {
+					description "Portmonitor source interface configuration";
+					configd:help "Source interface for portmonitoring";
+					configd:allowed "vyatta-portmonitor.pl --action=show_allowed_intf";
+					key "interface";
+					leaf interface {
+						type portmonitor-ifname;
+						description "Source interface name";
+						configd:help "Source interface name";
+						configd:allowed "vyatta-portmonitor.pl --action=show_allowed_intf";
+					}
+					leaf direction {
+						type direction;
+						description "Source interface direction for packets";
+						default "both";
+						configd:help "Policy for interface whether to receive and/or transmit packets";
+					}
+				}
+				leaf-list destination {
+					type portmonitor-ifname;
+					ordered-by "system";
+					max-elements "1";
+					description "Portmonitor destination interface configuration";
+					configd:help "Destination interface for portmonitoring";
+					configd:allowed "vyatta-portmonitor.pl --action=show_allowed_intf";
+				}
+				container erspan {
+					configd:help "Properties for session type erspan";
+					description "Properties for session type erspan";
+					leaf identifier {
+						type uint16 {
+							range 1..1023;
+						}
+						description "erspan identifier";
+						configd:help "erspan identifier";
+					}
+					leaf header {
+						type header-type;
+						description "erspan header type";
+						default "type-II";
+						configd:help "erspan header type";
+					}
+				}
+			}
+		}
+	}
+}

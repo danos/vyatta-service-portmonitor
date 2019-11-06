@@ -1,0 +1,10 @@
+# build files
+files
+*.log
+*.debhelper
+*.substvars
+autoreconf.*
+tmp
+
+# packages
+vyatta-*-yang

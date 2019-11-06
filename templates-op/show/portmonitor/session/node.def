@@ -1,0 +1,2 @@
+help: Show dataplane portmonitor information
+run: vplane-show-portmonitor.pl --show

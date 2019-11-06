@@ -1,0 +1,3 @@
+help: Show filter information for specific source interface
+allowed: vplane-show-portmonitor.pl --allowed-srcifs
+run: vyatta-dp-npf-show-rules interface:$4 portmonitor-in portmonitor-out

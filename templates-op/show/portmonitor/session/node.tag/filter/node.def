@@ -1,0 +1,2 @@
+help: Show filter information for specific portmonitor session
+run: vplane-show-portmonitor.pl --show-filter-info --session=$4

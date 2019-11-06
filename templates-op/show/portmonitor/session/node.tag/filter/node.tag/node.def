@@ -1,0 +1,3 @@
+help: Show filter information for specific source interface
+allowed: vplane-show-portmonitor.pl --allowed-pmsess-srcifs --session=$4
+run: vplane-show-portmonitor.pl --show-srcif-filter-info --session=$4 --srcif=$6

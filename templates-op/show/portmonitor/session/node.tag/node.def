@@ -1,0 +1,3 @@
+help: Show dataplane portmonitor session information
+allowed: ${vyatta_bindir}/vplane-show-portmonitor.pl --allowed
+run: vplane-show-portmonitor.pl --show --session=$4

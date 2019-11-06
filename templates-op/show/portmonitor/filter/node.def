@@ -1,0 +1,2 @@
+help: Show portmonitor filter information
+run: vyatta-dp-npf-show-rules all: portmonitor-in portmonitor-out

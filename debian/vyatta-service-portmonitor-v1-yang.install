@@ -1,0 +1,6 @@
+scripts/vplane-portmonitor-validate.pl opt/vyatta/sbin
+scripts/vplane-show-portmonitor.pl opt/vyatta/bin
+scripts/vyatta-portmonitor.pl opt/vyatta/sbin
+templates-op/show/portmonitor opt/vyatta/share/vyatta-op/templates/show
+templates-op/clear/portmonitor opt/vyatta/share/vyatta-op/templates/clear
+yang/vyatta-service-portmonitor-v1.yang usr/share/configd/yang

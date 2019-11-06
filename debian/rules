@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+#
+# This debian/rules uses debhelper.
+#
+
+%:
+	dh $@ --with=yang

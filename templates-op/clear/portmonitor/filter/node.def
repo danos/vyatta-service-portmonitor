@@ -1,0 +1,2 @@
+help: clear portmonitor filter statistics
+run: vyatta-dp-npf-clear all: portmonitor-in portmonitor-out
