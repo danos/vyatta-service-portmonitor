@@ -65,7 +65,8 @@ sub modify_disable {
     if ( $action eq "del" ) {
         send_cmd_to_controller( "del", "disable", $sessionid, "disable", 0, 0,
             0 );
-    } elsif ( $action eq "set" ) {
+    }
+    elsif ( $action eq "set" ) {
         send_cmd_to_controller( "set", "disable", $sessionid, "disable", 0, 0,
             0 );
     }
@@ -78,7 +79,8 @@ sub modify_filters {
     my $key;
     if ( $type eq "in" ) {
         $key = "filter-in";
-    } elsif ( $type eq "out" ) {
+    }
+    elsif ( $type eq "out" ) {
         $key = "filter-out";
     }
     return if ( !defined($key) );
@@ -243,7 +245,8 @@ sub change_sources {
               if (@filters_in);
             attach_filters_on_intf( $sessionid, $source, \@filters_out, "out" )
               if (@filters_out);
-        } elsif ( $config->isChanged("$sessionid source $source") ) {
+        }
+        elsif ( $config->isChanged("$sessionid source $source") ) {
             modify_source_intf( "set", $sessionid, $source );
         }
     }
@@ -270,7 +273,8 @@ sub change_disable {
     my ($sessionid) = @_;
     if ( $config->isAdded("$sessionid disable") ) {
         modify_disable( $sessionid, "set" );
-    } elsif ( $config->isDeleted("$sessionid disable") ) {
+    }
+    elsif ( $config->isDeleted("$sessionid disable") ) {
         modify_disable( $sessionid, "del" );
     }
 }
@@ -352,7 +356,8 @@ sub update_portmonitor {
     foreach my $session (@sessions) {
         if ( $config->isAdded($session) ) {
             set_session($session);
-        } elsif ( $config->isChanged($session) ) {
+        }
+        elsif ( $config->isChanged($session) ) {
             change_session($session);
         }
     }
