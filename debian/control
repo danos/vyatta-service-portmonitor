@@ -23,3 +23,10 @@ Depends: vyatta-cfg (>= 0.104.32),
 Description: Portmonitor scripts
  Vyatta configuration/operational commands for
  portmonitor service.
+
+Package: vyatta-service-portmonitor-deviation-broadcom-stratadnx-v1-yang
+Architecture: all
+Depends: ${misc:Depends},
+	 ${yang:Depends}
+Description: Portmonitor service yang deviations for Broadcom StrataDNX platforms 
+ Vyatta configuration yang deviations for Broadcom StratadNX platforms

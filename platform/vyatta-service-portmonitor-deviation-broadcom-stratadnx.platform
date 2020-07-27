@@ -1,0 +1,3 @@
+[Platform ufi.s9500-30xs]
+Yang=vyatta-service-portmonitor-deviation-broadcom-stratadnx-v1.yang
+Features=vyatta-service-portmonitor-v1:source-vlan
