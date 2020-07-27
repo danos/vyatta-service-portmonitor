@@ -14,6 +14,7 @@ use Getopt::Long;
 use Vyatta::Config;
 use Vyatta::VPlaned;
 use Vyatta::Misc;
+use Array::Utils qw(array_diff);
 
 my %session_type = (
     'span'               => '1',
@@ -145,6 +146,35 @@ sub modify_source_intf {
 
     send_cmd_to_controller( $action, "source $source",
         $sessionid, "srcif", $srcif, $vif, $direction );
+
+    my @rxvlans = $config->returnValues(
+        "$sessionid source $source vlan-parameters rx vlan-id");
+    my @origrxvlans = $config->returnOrigValues(
+        "$sessionid source $source vlan-parameters rx vlan-id");
+
+    if ( array_diff( @rxvlans, @origrxvlans ) ) {
+        my $num = scalar @rxvlans;
+        $ctrl->store(
+            "service portmonitor session $sessionid source $srcif vlan rx",
+"portmonitor $action session $sessionid srcif $srcif vlan rx $num @rxvlans",
+            undef,
+            'SET'
+        );
+    }
+    my @txvlans = $config->returnValues(
+        "$sessionid source $source vlan-parameters tx vlan-id");
+    my @origtxvlans = $config->returnOrigValues(
+        "$sessionid source $source vlan-parameters tx vlan-id");
+
+    if ( array_diff( @txvlans, @origtxvlans ) ) {
+        my $num = scalar @txvlans;
+        $ctrl->store(
+            "service portmonitor session $sessionid source $srcif vlan tx",
+"portmonitor $action session $sessionid srcif $srcif vlan tx $num @txvlans",
+            undef,
+            'SET'
+        );
+    }
 }
 
 sub is_source_session {

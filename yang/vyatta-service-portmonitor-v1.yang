@@ -23,6 +23,9 @@ module vyatta-service-portmonitor-v1 {
 	import vyatta-interfaces-bonding-v1 {
 		prefix interfaces-bonding;
 	}
+	import vyatta-types-v1 {
+		prefix types;
+	}
 
 	organization "AT&T Inc.";
 	contact
@@ -32,7 +35,7 @@ module vyatta-service-portmonitor-v1 {
 		 Web: www.att.com";
 
 	description
-		"Copyright (c) 2018-2019, AT&T Intellectual Property.
+		"Copyright (c) 2018-2020, AT&T Intellectual Property.
 		 All rights reserved.
 
 		 Copyright (c) 2015-2017 by Brocade Communications Systems, Inc.
@@ -70,6 +73,10 @@ module vyatta-service-portmonitor-v1 {
 		 Vyatta portmonitor yang file and portmonitor specific
 		 scripts.";
 
+	revision 2020-07-28 {
+		description "Add support for configuring vlans for port monitoring";
+	}
+
 	revision 2018-10-15 {
 		description "Include bonding interface in portmonitor interface type";
 	}
@@ -92,6 +99,10 @@ module vyatta-service-portmonitor-v1 {
 
 	revision 2015-08-14 {
 		description "Initial revision of version 1.";
+	}
+
+	feature source-vlan {
+		description "Support for source interface vlan monitoring";
 	}
 
 	typedef portmonitor-ifname {
@@ -247,6 +258,37 @@ module vyatta-service-portmonitor-v1 {
 						description "Source interface direction for packets";
 						default "both";
 						configd:help "Policy for interface whether to receive and/or transmit packets";
+					}
+					container vlan-parameters {
+						if-feature source-vlan;
+						configd:help "Vlan parameters for the portmonitor session";
+						description "Vlan parameters for the session";
+						container rx {
+							leaf-list vlan-id {
+								type types:vlan;
+								max-elements "7";
+								description "Portmonitor session source rx vlan-id to monitor";
+								configd:help "Portmonitor session source rx vlan-id to monitor";
+							}
+							must "../../direction = 'both' or ../../direction ='rx'" {
+								error-message "vlans for rx direction can only be applied if direction is rx or both";
+							}
+							description "Source Rx Vlan parameters";
+							configd:help "Source Rx Vlan parameters";
+						}
+						container tx {
+							leaf-list vlan-id {
+								type types:vlan;
+								max-elements "7";
+								description "Portmonitor session source tx vlan-id";
+								configd:help "Portmonitor session source tx vlan-id to monitor";
+							}
+							must "../../direction = 'both' or ../../direction ='tx'" {
+								error-message "vlans for tx direction can only be applied if direction is tx or both";
+							}
+							description "Source Tx Vlan parameters";
+							configd:help "Source Tx Vlan parameters";
+						}
 					}
 				}
 				leaf-list destination {
