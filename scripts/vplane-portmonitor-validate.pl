@@ -59,6 +59,10 @@
 # hw_rx_src_count  < Max num of hardware-switched rx source across all sessions >
 # hw_tx_src_count  < Max num of hardware-switched tx source across all sessions >
 #
+# If SPAN is supported in hw_only, both source and destination should be interfaces
+# switched in hardware only. Bonding interfaces can be destination if processed in hardware
+# only.
+#
 
 use strict;
 use warnings;
@@ -67,11 +71,13 @@ use lib "/opt/vyatta/share/perl5/";
 use Vyatta::Config;
 use Vyatta::Interface;
 use Vyatta::SwitchConfig qw(is_hw_interface);
-use Vyatta::Platform qw(get_platform_feature_limits);
+use Vyatta::Platform
+  qw(get_platform_feature_limits is_supported_platform_feature);
 
 my $pmconfig     = new Vyatta::Config("service portmonitor");
 my $dpconfig     = new Vyatta::Config("interfaces dataplane");
 my $vhconfig     = new Vyatta::Config("interfaces vhost");
+my $bondconfig   = new Vyatta::Config("interfaces bonding");
 my $erspanconfig = new Vyatta::Config("interfaces erspan");
 
 my %physrcs             = ();
@@ -182,14 +188,32 @@ sub check_valid_dp_intf {
     die
 "Unknown interface name/type: $interface, needs to be valid dataplane interface\n"
       unless defined($intf);
-    die
-"Interface $interface of session $session is not a valid dataplane interface\n"
-      unless ( $intf->type() eq 'dataplane' || $intf->type() eq 'vhost' );
-    die
-"Interface $interface of session $session is not a valid destination interface\n"
-      if ( $type eq 'dst'
-        && $intf->type() ne 'dataplane'
-        && $intf->type() ne 'vhost' );
+
+
+    # Check if platform supports portmonitor in hardware only
+    my $hw_only = is_supported_platform_feature( "portmonitor.hardware-only",
+        undef, undef );
+
+    # If portmonitor feature is supported in hardware only, both source and destination
+    # interfaces should be switched in hardware. When hardware only support, source
+    # interfaces can only be dataplane interfaces and destination can be dataplane
+    # or bonding interface.
+    if ($hw_only) {
+        die "$interface of session $session is not a hardware interface\n"
+          if ( !is_hw_interface($interface) );
+        die
+"Hardware interface $interface of session $session is not a valid source interface\n"
+          if ( $type eq 'src' && $intf->type() ne 'dataplane' );
+        die
+"Hardware interface $interface of session $session is not a valid destination interface\n"
+          if ( $type eq 'dst'
+            && ( $intf->type() ne 'dataplane' && $intf->type() ne 'bonding' ) );
+    }
+    else {
+        die
+"Interface $interface of session $session is not a valid $type interface\n"
+          if ( $intf->type() ne 'dataplane' && $intf->type() ne 'vhost' );
+    }
     my $config = new Vyatta::Config( $intf->path() );
     my $bond   = $config->returnValue("bond-group");
     die
@@ -204,6 +228,9 @@ sub get_intf_config {
 
     if ( $if->type() eq 'vhost' ) {
         $cfg = $vhconfig;
+    }
+    if ( $if->type() eq 'bonding' ) {
+        $cfg = $bondconfig;
     }
     return $cfg;
 }
@@ -399,9 +426,11 @@ sub check_valid_destination_interface {
         $phydests{$destination} = undef;
     }
 
+    my $hw_only = is_supported_platform_feature( "portmonitor.hardware-only",
+        undef, undef );
     die
-"Hardware-switched destination interface $destination not supported for session\n"
-      if ( is_hw_interface($destination) );
+"Hardware-switched destination interface $destination not supported on this platform\n"
+      if ( is_hw_interface($destination) && ( !$hw_only ) );
 }
 
 sub check_valid_erspan_tunnel {
