@@ -147,6 +147,14 @@ sub show_portmonitor {
                     printf $fmt, "      Direction: ", $intf->{direction}
                       unless ( 'rspan-destination' eq $stype
                         || 'erspan-destination' eq $stype );
+                    my $rxv = $intf->{rx_vlan};
+                    if (@$rxv) {
+                        printf $fmt, "      RX vlans: ", join( ',', @$rxv );
+                    }
+                    my $txv = $intf->{tx_vlan};
+                    if (@$txv) {
+                        printf $fmt, "      TX vlans: ", join( ',', @$txv );
+                    }
                 }
             }
             printf $fmt, "  Destination interface: ",
