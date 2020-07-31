@@ -30,3 +30,12 @@ Depends: ${misc:Depends},
 	 ${yang:Depends}
 Description: Portmonitor service yang deviations for Broadcom StrataDNX platforms 
  Vyatta configuration yang deviations for Broadcom StratadNX platforms
+
+Package: libvyatta-portmonitor
+Architecture: all
+Depends: vyatta-cfg (>= 1.26),
+	 libconfig-tiny-perl,
+	 ${misc:Depends},
+	 ${perl:Depends},
+Description: Portmonitor module library
+ Portmonitor module library that can be used by other modules to get portmonitor information
