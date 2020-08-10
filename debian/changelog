@@ -1,3 +1,14 @@
+vyatta-service-portmonitor (3.7) unstable; urgency=medium
+
+  * Run perltidy and update the scripts
+  * Support for hw-switched destination interface
+  * Add support to configure source vlans
+  * Add yang deviations for StrataDNX platforms
+  * Add vlan information to show session output
+  * Add library function to get mirror destinations
+
+ -- Shweta Choudaha <shweta.choudaha@att.com>  Mon, 10 Aug 2020 18:48:00 +0100
+
 vyatta-service-portmonitor (3.6) unstable; urgency=medium
 
   * DANOS Import master
