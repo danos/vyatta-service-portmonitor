@@ -52,7 +52,7 @@ module vyatta-service-portmonitor-deviation-broadcom-stratadnx-v1 {
 
 		 Deviations for portmonitor on Broadcom StrataDNX platforms";
 
-	revision 2020-07-28 {
+	revision 2020-08-17 {
 		description "Initial revision";
 	}
 
@@ -62,4 +62,15 @@ module vyatta-service-portmonitor-deviation-broadcom-stratadnx-v1 {
 	deviation /service:service/pm:portmonitor/pm:session/pm:erspan {
 		deviate not-supported;
 	}
+	deviation /service:service/pm:portmonitor/pm:session/pm:source/pm:vlan-parameters/pm:tx/pm:vlan-id {
+		deviate replace {
+                        max-elements "7";
+                }
+	}
+	deviation /service:service/pm:portmonitor/pm:session/pm:source/pm:vlan-parameters/pm:rx/pm:vlan-id {
+		deviate replace {
+                        max-elements "6";
+                }
+	}
+
 }
