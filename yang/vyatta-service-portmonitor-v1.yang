@@ -73,7 +73,7 @@ module vyatta-service-portmonitor-v1 {
 		 Vyatta portmonitor yang file and portmonitor specific
 		 scripts.";
 
-	revision 2020-07-28 {
+	revision 2020-08-17 {
 		description "Add support for configuring vlans for port monitoring";
 	}
 
@@ -269,9 +269,9 @@ module vyatta-service-portmonitor-v1 {
 								max-elements "32";
 								description "Portmonitor session source rx vlan-id to monitor";
 								configd:help "Portmonitor session source rx vlan-id to monitor";
-							}
-							must "../../direction = 'both' or ../../direction ='rx'" {
-								error-message "vlans for rx direction can only be applied if direction is rx or both";
+								must "../../../direction = 'both' or ../../../direction = 'rx'" {
+									error-message "vlans for rx direction can only be applied if direction is rx or both";
+								}
 							}
 							description "Source Rx Vlan parameters";
 							configd:help "Source Rx Vlan parameters";
@@ -282,9 +282,9 @@ module vyatta-service-portmonitor-v1 {
 								max-elements "32";
 								description "Portmonitor session source tx vlan-id";
 								configd:help "Portmonitor session source tx vlan-id to monitor";
-							}
-							must "../../direction = 'both' or ../../direction ='tx'" {
-								error-message "vlans for tx direction can only be applied if direction is tx or both";
+								must "../../../direction = 'both' or ../../../direction = 'tx'" {
+									error-message "vlans for tx direction can only be applied if direction is tx or both";
+								}
 							}
 							description "Source Tx Vlan parameters";
 							configd:help "Source Tx Vlan parameters";
