@@ -266,7 +266,7 @@ module vyatta-service-portmonitor-v1 {
 						container rx {
 							leaf-list vlan-id {
 								type types:vlan;
-								max-elements "7";
+								max-elements "32";
 								description "Portmonitor session source rx vlan-id to monitor";
 								configd:help "Portmonitor session source rx vlan-id to monitor";
 							}
@@ -279,7 +279,7 @@ module vyatta-service-portmonitor-v1 {
 						container tx {
 							leaf-list vlan-id {
 								type types:vlan;
-								max-elements "7";
+								max-elements "32";
 								description "Portmonitor session source tx vlan-id";
 								configd:help "Portmonitor session source tx vlan-id to monitor";
 							}
