@@ -148,11 +148,11 @@ sub show_portmonitor {
                       unless ( 'rspan-destination' eq $stype
                         || 'erspan-destination' eq $stype );
                     my $rxv = $intf->{rx_vlan};
-                    if (@$rxv) {
+                    if ( defined($rxv) and (@$rxv) ) {
                         printf $fmt, "      RX vlans: ", join( ',', @$rxv );
                     }
                     my $txv = $intf->{tx_vlan};
-                    if (@$txv) {
+                    if ( defined($txv) and (@$txv) ) {
                         printf $fmt, "      TX vlans: ", join( ',', @$txv );
                     }
                 }
