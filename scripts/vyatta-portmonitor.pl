@@ -46,9 +46,11 @@ my $filter_updated = 0;
 #         - value is node's value. e.g. 'dp0s3', 'span'
 #         - param1 is vif id. '300'
 #         - param2 is direction of physical/ vif interface. e.g. 'rx'
+#         - interface is the interface that the cfg is applied to. Used
+#           by the controller to force ordering of commands arriving at dataplane
 # Validations are already done, just perform actions
 sub send_cmd_to_controller {
-    my ( $action, $cskey, $sessionid, $key, $value, $param1, $param2 ) = @_;
+    my ( $action, $cskey, $sessionid, $key, $value, $param1, $param2, $interface ) = @_;
     my $cs_action = 'SET';
     $cs_action = 'DELETE'
       if ( $action eq 'del' );
@@ -56,7 +58,7 @@ sub send_cmd_to_controller {
     $ctrl->store(
         "service portmonitor session $sessionid $cskey",
         "portmonitor $action session $sessionid $key $value $param1 $param2",
-        undef, $cs_action
+        $interface, $cs_action
     );
 }
 
@@ -107,7 +109,7 @@ sub detach_filters_on_intf {
         $ctrl->store(
 "service portmonitor session $sessionid __pmf_attach $intf $type $filter",
             "npf-cfg detach interface:$intf portmonitor-$type fw:$filter",
-            undef,
+            $intf,
             "DELETE"
         );
     }
@@ -121,7 +123,7 @@ sub attach_filters_on_intf {
         $ctrl->store(
 "service portmonitor session $sessionid __pmf_attach $intf $type $filter",
             "npf-cfg attach interface:$intf portmonitor-$type fw:$filter",
-            undef,
+            $intf,
             "SET"
         );
     }
@@ -145,7 +147,7 @@ sub modify_source_intf {
     }
 
     send_cmd_to_controller( $action, "source $source",
-        $sessionid, "srcif", $srcif, $vif, $direction );
+        $sessionid, "srcif", $srcif, $vif, $direction, $srcif );
 
     my @rxvlans = $config->returnValues(
         "$sessionid source $source vlan-parameters rx vlan-id");
@@ -157,7 +159,7 @@ sub modify_source_intf {
         $ctrl->store(
             "service portmonitor session $sessionid source $srcif vlan rx",
 "portmonitor $action session $sessionid srcif $srcif vlan rx $num @rxvlans",
-            undef,
+            $srcif,
             'SET'
         );
     }
@@ -171,7 +173,7 @@ sub modify_source_intf {
         $ctrl->store(
             "service portmonitor session $sessionid source $srcif vlan tx",
 "portmonitor $action session $sessionid srcif $srcif vlan tx $num @txvlans",
-            undef,
+            $srcif,
             'SET'
         );
     }
@@ -210,7 +212,7 @@ sub modify_destination {
     my ( $dstif, $vif ) = split /\./, $destination;
     $vif = 0 unless defined($vif);
     send_cmd_to_controller( $action, "destination", $sessionid, "dstif", $dstif,
-        $vif, 0 );
+        $vif, 0, $dstif);
 }
 
 sub set_destinations {
