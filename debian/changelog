@@ -1,3 +1,16 @@
+vyatta-service-portmonitor (3.8) unstable; urgency=medium
+
+  [ Shweta Choudaha ]
+  * yang: Use yang-deviation for max vlan limit
+  * yang: Change generic vlan max for rx/tx to 32
+  * yang: move vlan direction check to vlan-id leaf
+  * scripts: Check if rxv/txv is defined
+
+  [ Paul Atkins ]
+  * scripts: set the interface hint when setting src/dst interface
+
+ -- Sharmila Podury <sharmila.podury@att.com>  Mon, 12 Oct 2020 10:37:52 -0700
+
 vyatta-service-portmonitor (3.7) unstable; urgency=medium
 
   * Run perltidy and update the scripts
